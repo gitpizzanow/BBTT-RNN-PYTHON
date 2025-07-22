@@ -1,5 +1,8 @@
+import numpy as np
+
+
 def CLIP(x):
-    return 5.0 if x>5.0 else -0.5 if x<0.5 else x
+    return np.clip(x,-5.0,5.0)
 
 
 def Loss(y , yhat):
