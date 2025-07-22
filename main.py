@@ -1,6 +1,6 @@
 import numpy as np
 from Structure import RNN
-from functions import CLIP , Loss
+from functions import CLIP , Loss , mean_squared_error, mean_absolute_error, regression_accuracy
 
 
 
@@ -92,16 +92,39 @@ if __name__ == '__main__':
     rnn = RNN(max_timestep)
 
     #Train 
-    for e in range(100):
+    for e in range(300):
         forward(
             rnn , X,y,max_timestep
         )
-        print(f'loss {e+1 }= {np.mean(rnn.loss)} \n')
+        
         grads = backward(
             rnn , X,y,max_timestep
         )
 
         apply_gradients(rnn,grads,0.005)
 
+    # Evaluate
+    mse = mean_squared_error(y, rnn.y_pred)
+    mae = mean_absolute_error(y, rnn.y_pred)
+    acc = regression_accuracy(y, rnn.y_pred, tolerance=0.3)
 
-        
+    print(f"MSE: {mse:.4f}")
+    print(f"MAE: {mae:.4f}")
+    print(f"Regression Accuracy (±0.1): {acc*100:.2f}%") # tolerance margin
+
+    # MSE: 0.0373 ->  predictions are close on average
+    # MAE: 0.1927 -> average error 
+    # Regression Accuracy (±0.1): 100.0%
+
+    
+    """
+    X_new = np.array([
+        [3],
+        [4]
+    ])
+    y_dummy = np.zeros_like(X_new) 
+    forward(rnn, X_new, y_dummy, max_timestep)
+    
+    for t,pred in enumerate(rnn.y_pred):
+        print(f"Prediction at t={t}: {pred.flatten()[0]:.4f}")
+    """
