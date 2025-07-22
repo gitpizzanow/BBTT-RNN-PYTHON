@@ -1,42 +1,27 @@
 import numpy as np
-from Structure import RNN
-from functions import CLIP , Loss
+
+class RNN :
+    def __init__(this, 
+        max_timestep,
+        input_size  = 1,
+        hidden_size = 3, 
+        output_size = 1
+        ):
+        this.max_timestep = max_timestep
+        this.input_size = input_size
+        this.hidden_size = hidden_size
+        this.output_size = output_size
+
+        this.wxh = np.random.uniform(-1,1,(hidden_size , input_size)) * 0.1
+        this.whh = np.random.uniform(-1,1,(hidden_size , hidden_size)) * 0.1
+        this.why = np.random.uniform(-1,1,(output_size , hidden_size)) * 0.1
+
+        this.bxh = np.zeros((hidden_size, 1))
+        this.by  = np.zeros((output_size, 1))
+
+        this.h      = [np.zeros((hidden_size, 1)) for _ in range(max_timestep + 1)]
+        this.h_row  = [np.zeros((hidden_size, 1)) for _ in range(max_timestep)]
+        this.y_pred = [np.zeros((output_size, 1)) for _ in range(max_timestep)]
+        this.loss   = np.zeros(max_timestep)
 
 
-
-def forward(rnn : RNN ,
-            X : np.ndarray ,
-            y : np.ndarray,
-            max_timestep:int):
-
-    for t in range(max_timestep):
-        x = X[t].reshape(-1,1)
-        rnn.h_row[t] = rnn.wxh @ x + rnn.whh @ rnn.h[t] + rnn.bxh
-        rnn.h[t+1] = np.tanh(rnn.h_row[t])
-        rnn.y_pred[t] = rnn.why @ rnn.h[t+1] + rnn.by
-        
-        rnn.loss[t] = Loss(y[t], rnn.y_pred[t])
-
-        
-
-
-
-if __name__ == '__main__':
-    max_timestep : int = 2
-    rnn = RNN(max_timestep)
-    X = np.array([
-    [1],   
-    [2]    ])  
-
-    y = np.array([
-        [2],   
-        [3]    ]) 
-    
-    
-    forward(
-        rnn , X,y,max_timestep
-    )
-
-
-    print(rnn.y_pred) # [array([[-0.00501238]]), array([[-0.0100752]])]
-  
